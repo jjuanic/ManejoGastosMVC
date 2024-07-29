@@ -1,0 +1,77 @@
+﻿@model IngresoUpdateDeleteViewModel
+@{
+    ViewData["Title"] = "Cargar Ingreso";
+}
+
+<h1>Estas modificando el ingreso @Model.Nombre para el mes @Model.FechaRegistro.Month del año @Model.FechaRegistro.Year</h1>
+<form asp-action="UpdateIngreso" method="post">
+    <input type="hidden" asp-for="FechaRegistro" />
+    <input type="hidden" asp-for="FechaIndex" />
+    <input type="hidden" asp-for="IdIngreso" />
+    <input type="hidden" asp-for="IdTipoIngreso" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IdTipoIngreso" class="form-label">Tipo Ingreso</label>
+        <select asp-for="IdTipoIngreso" class="form-select" id="tipoIngresoSelect" disabled>
+            <option value="1">Mensual</option>
+            <option value="2">Único</option>
+        </select>
+        <span asp-validation-for="IdTipoIngreso" class="text-danger"></span>
+    </div>
+
+    <text>No se puede modificar el tipo del ingreso</text>
+    <br></br>
+    <div class="mb-3" id="fechaFinContainer" style="display:none;">
+        <label asp-for="FechaFin" class="form-label">Fecha Fin </label>
+        <input asp-for="FechaFin" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+        <text>Este campo no es obligatorio. Puede dejarlo vacío si no conoce la fecha en la que este ingreso tendrá un fin</text>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Valor" class="form-label"></label>
+        <input asp-for="Valor" class="form-control" />
+        <span asp-validation-for="Valor" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary" onclick="return validateForm()">Enviar</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script type="text/javascript">
+        function toggleFechaFin() {
+            var tipoIngreso = document.getElementById("tipoIngresoSelect").value;
+            var fechaFinContainer = document.getElementById("fechaFinContainer");
+            if (tipoIngreso == "1") {
+                fechaFinContainer.style.display = "block";
+            } else {
+                fechaFinContainer.style.display = "none";
+            }
+        }
+
+        // Llamar a la función al cargar la página para establecer el estado inicial
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleFechaFin();
+        });
+
+        function validateForm() {
+            var fechaRegistro = new Date(document.querySelector('input[name="FechaRegistro"]').value);
+            var fechaFinInput = document.querySelector('input[name="FechaFin"]');
+            if (fechaFinInput && fechaFinInput.value) {
+                var fechaFin = new Date(fechaFinInput.value);
+                if (fechaFin < fechaRegistro) {
+                    alert("La Fecha Fin no puede ser menor que la Fecha de Registro");
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
+}

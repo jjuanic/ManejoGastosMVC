@@ -1,0 +1,100 @@
+﻿@model IndexViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    string ObtenerTipo(int tipo)
+    {
+        return tipo == 2 ? "Único" : "Mensual";
+    }
+
+    float Sumatoria(IEnumerable<Ingreso> ingresos)
+    {
+        return ingresos.Sum(ingreso => ingreso.Valor);
+    }
+
+    string FormatearFechaFin(DateTime? fecha)
+    {
+        if (!fecha.HasValue)
+        {
+            return "";
+        }
+
+        return fecha.Value.ToString("yyyy/MM/dd");
+    }
+
+    var sumatoriaIngresos = Sumatoria(Model.Ingresos);
+}
+
+<div class="text-center">
+    <h1 class="display-4">Manejo de Gastos!</h1>
+</div>
+
+<div class="text-center">
+    <h1>@Model.Fecha.ToString("MM/yy")</h1>
+    <div class="btn-group" role="group">
+        <form asp-action="MesAnterior" method="post" class="me-2">
+            <input type="hidden" name="fecha" value="@Model.Fecha.ToString("yyyy-MM-dd")" />
+            <button type="submit" class="btn btn-primary">Mes Anterior</button>
+        </form>
+        <form asp-action="SiguienteMes" method="post">
+            <input type="hidden" name="fecha" value="@Model.Fecha.ToString("yyyy-MM-dd")" />
+            <button type="submit" class="btn btn-primary">Mes Siguiente</button>
+        </form>
+    </div>
+</div>
+
+<!-- Reorganización en tres columnas -->
+<div class="row">
+    <!-- Columna de Ingresos -->
+    <div class="col-md-6">
+        <div class="text-center">
+        <h2>Ingresos</h2>
+        <a asp-action="CreateIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy/MM/dd")" class="btn btn-primary mb-3">Crear un Ingreso</a>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Valor</th>
+                    <th>Fecha Registro</th>
+                    <th>Fecha Fin</th>
+                    <th>Tipo Ingreso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="filaIngreso">
+                @foreach (var ingreso in Model.Ingresos)
+                {
+                    <tr>
+                        <td>@ingreso.Nombre</td>
+                        <td>@ingreso.Valor</td>
+                        <td>@ingreso.FechaRegistro.ToString("yyyy/MM/dd")</td>
+                        <td>@FormatearFechaFin(ingreso.FechaFin)</td>
+                        <td>@ObtenerTipo(ingreso.IdTipoIngreso)</td>
+                        <td>
+                            <a asp-action="EditIngreso" asp-route-id="@ingreso.IdIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">Editar</a>
+                            <a asp-action="DeleteIngreso" asp-route-id="@ingreso.IdIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-danger">Borrar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Columna de Egresos (Placeholder) -->
+    <div class="col-md-6">
+        <div class="text-center">
+        <h2>Egresos</h2>
+            <a asp-action="" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-primary mb-3">Crear un Egreso</a>
+        </div>
+        <!-- Aquí puedes agregar la tabla o la información de los egresos -->
+    </div>
+
+    <!-- Columna de Resumen (Placeholder) -->
+    <div class="text-center">
+        <h2>Resumen</h2>
+        <span>Ingresos: @sumatoriaIngresos</span>
+        <!-- Aquí puedes agregar un resumen o información adicional -->
+    </div>
+</div>
