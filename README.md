@@ -1,4 +1,4 @@
-### Aplicación para llevar nuestro Presupuesto 
+### Aplicación para llevar al día nuestro Presupuesto 
 
 Esta aplicación hecha en ASP.NET MVC 8 y SQL Server nos permite llevar al día nuestros ingresos y egresos mensuales.
 
