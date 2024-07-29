@@ -6,6 +6,8 @@ namespace PresuMVC.Services
 {
     public interface IRepositorioEgresos
     {
+        Task<int> CreateEgreso(Egreso egreso);
+        Task<IEnumerable<Egreso>> GetEgresos();
     }
     public class RepositorioEgresos : IRepositorioEgresos
     {
@@ -16,7 +18,7 @@ namespace PresuMVC.Services
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task CreateEgreso(Egreso egreso)
+        public async Task<int> CreateEgreso(Egreso egreso)
         {
             using var connection = new SqlConnection(connectionString);
 
@@ -40,6 +42,15 @@ namespace PresuMVC.Services
             };
 
             egreso.IdEgreso = await connection.QuerySingleAsync<int>(query, parameters);
+            return egreso.IdEgreso;
+        }
+
+        public async Task<IEnumerable<Egreso>> GetEgresos()
+        {
+            using var connection = new SqlConnection(connectionString);
+            return await connection.QueryAsync<Egreso>
+               (@"SELECT * FROM Egreso");
+
         }
 
 

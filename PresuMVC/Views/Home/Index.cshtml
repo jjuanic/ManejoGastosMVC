@@ -3,14 +3,24 @@
 @{
     ViewData["Title"] = "Home Page";
 
-    string ObtenerTipo(int tipo)
+    string ObtenerTipoIngreso(int tipo)
     {
         return tipo == 2 ? "Único" : "Mensual";
     }
 
-    float Sumatoria(IEnumerable<Ingreso> ingresos)
+    string ObtenerTipoEgreso(int tipo)
+    {
+        return tipo == 2 ? "Único" : (tipo == 3 ? "Cuota" : "Suscripción");
+    }
+
+    float SumatoriaIngresos(IEnumerable<Ingreso> ingresos)
     {
         return ingresos.Sum(ingreso => ingreso.Valor);
+    }
+
+    float SumatoriaEgresos(IEnumerable<Egreso> egresos)
+    {
+        return egresos.Sum(egresos => egresos.Valor);
     }
 
     string FormatearFechaFin(DateTime? fecha)
@@ -22,8 +32,30 @@
 
         return fecha.Value.ToString("yyyy/MM/dd");
     }
+    string FormatearFechaCuota(DateTime? fecha)
+    {
+        if (!fecha.HasValue)
+        {
+            return "";
+        }
 
-    var sumatoriaIngresos = Sumatoria(Model.Ingresos);
+        return fecha.Value.ToString("yyyy/MM/dd");
+    }
+
+    string FormatearNroCuota(int? nroCuota)
+    {
+        if (!nroCuota.HasValue)
+        {
+            return "";
+        }
+
+        return nroCuota.Value.ToString();
+    }
+
+
+    var sumatoriaIngresos = SumatoriaIngresos(Model.Ingresos);
+    var sumatoriaEgresos = SumatoriaEgresos(Model.Egresos);
+    var diferenciaIE = sumatoriaIngresos - sumatoriaEgresos;
 }
 
 <div class="text-center">
@@ -42,6 +74,14 @@
             <button type="submit" class="btn btn-primary">Mes Siguiente</button>
         </form>
     </div>
+</div>
+
+<!-- Columna de Resumen (Placeholder) -->
+<div class="text-center">
+    <h2>Resumen</h2>
+    <span>Ingresos: @sumatoriaIngresos</span> <br />
+    <span>Egresos: @sumatoriaEgresos</span> <br />
+    <span>Diferencia I-E: @diferenciaIE</span>
 </div>
 
 <!-- Reorganización en tres columnas -->
@@ -71,7 +111,7 @@
                         <td>@ingreso.Valor</td>
                         <td>@ingreso.FechaRegistro.ToString("yyyy/MM/dd")</td>
                         <td>@FormatearFechaFin(ingreso.FechaFin)</td>
-                        <td>@ObtenerTipo(ingreso.IdTipoIngreso)</td>
+                        <td>@ObtenerTipoIngreso(ingreso.IdTipoIngreso)</td>
                         <td>
                             <a asp-action="EditIngreso" asp-route-id="@ingreso.IdIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">Editar</a>
                             <a asp-action="DeleteIngreso" asp-route-id="@ingreso.IdIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-danger">Borrar</a>
@@ -86,15 +126,40 @@
     <div class="col-md-6">
         <div class="text-center">
         <h2>Egresos</h2>
-            <a asp-action="" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-primary mb-3">Crear un Egreso</a>
+            <a asp-action="CreateEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-primary mb-3">Crear un Egreso</a>
         </div>
         <!-- Aquí puedes agregar la tabla o la información de los egresos -->
-    </div>
-
-    <!-- Columna de Resumen (Placeholder) -->
-    <div class="text-center">
-        <h2>Resumen</h2>
-        <span>Ingresos: @sumatoriaIngresos</span>
-        <!-- Aquí puedes agregar un resumen o información adicional -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Valor</th>
+                    <th>Fecha Registro</th>
+                    <th>Fecha Cuota</th>
+                    <th>Nro Cuota</th>
+                    <th>Fecha Fin</th>
+                    <th>Tipo Egreso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="filaEgresos">
+                @foreach (var egreso in Model.Egresos)
+                {
+                    <tr>
+                        <td>@egreso.Nombre</td>
+                        <td>@egreso.Valor</td>
+                        <td>@egreso.FechaRegistro.ToString("yyyy/MM/dd")</td>
+                        <td>@FormatearFechaCuota(egreso.FechaCuota)</td>
+                        <td>@FormatearNroCuota(egreso.CuotaNro)</td>
+                        <td>@FormatearFechaFin(egreso.FechaFin)</td>
+                        <td>@ObtenerTipoEgreso(egreso.IdTipoEgreso)</td>
+                        <td>
+                            <a asp-action="EditIngreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">Editar</a>
+                            <a asp-action="DeleteIngreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-danger">Borrar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

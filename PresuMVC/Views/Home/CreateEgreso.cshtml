@@ -1,0 +1,99 @@
+﻿@model Egreso
+@{
+    ViewData["Title"] = "Cargar Egreso";
+}
+
+<h1>Estas creando un egreso para el mes @Model.FechaRegistro.Month del año @Model.FechaRegistro.Year</h1>
+<form asp-action="CreateEgreso" method="post">
+    <input type="hidden" asp-for="FechaRegistro" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IdTipoEgreso" class="form-label">Tipo Egreso</label>
+        <select asp-for="IdTipoEgreso" class="form-select" id="tipoEgresoSelect" onchange="toggleTipo()">
+            <option value="1">Suscripción</option>
+            <option value="2">Único</option>
+            <option value="3">Compra en Cuotas</option>
+        </select>
+        <span asp-validation-for="IdTipoEgreso" class="text-danger"></span>
+    </div>
+
+@*     <div class="mb-3" id="fechaFinContainer" style="display:none;">
+        <label asp-for="FechaFin" class="form-label">Fecha Fin </label>
+        <input asp-for="FechaFin" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+        <text>Este campo no es obligatorio. Puede dejarlo vacío si no conoce la fecha en la que este ingreso tendrá un fin</text>
+    </div> *@
+
+    <div class="mb-3" id="cantCuotasContainer" style="display:none;">
+        <label asp-for="CantCuotas" class="form-label"> Cantidad de Cuotas </label>
+        <input asp-for="CantCuotas" class="form-control" id="cantCuotasValue" oninput="actualizarValor()"/>
+        <span asp-validation-for="CantCuotas" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Valor" class="form-label"></label>
+        <input asp-for="Valor" class="form-control" id="valorValue" oninput="actualizarValor()" />
+        <span asp-validation-for="Valor" class="text-danger"></span>
+        <text> En caso de estar ingresando un egreso en cuotas, este es el valor por cuota. </text>
+    </div>
+
+    <div class="mb-3" id="valorTotalContainer" style="display:none;">
+        <label asp-for="ValorTotal" class="form-label"> Valor Total </label>
+        <input asp-for="ValorTotal" class="form-control" id="valorTotalValue" disabled />
+        <span asp-validation-for="ValorTotal" class="text-danger"></span>
+        <text></text>
+    </div>
+
+    <button type="submit" class="btn btn-primary" onclick="return validateForm()">Enviar</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script type="text/javascript">
+        function toggleTipo() {
+            var tipoEgreso = document.getElementById("tipoEgresoSelect").value;
+            var cantCuotasContainer = document.getElementById("cantCuotasContainer");
+            var valorTotalContainer = document.getElementById("valorTotalContainer");
+            if (tipoEgreso == "3") {
+                cantCuotasContainer.style.display = "block";
+                valorTotalContainer.style.display = "block";
+            } else {
+                cantCuotasContainer.style.display = "none";
+                valorTotalContainer.style.display = "none";
+            }
+        }
+
+        function actualizarValor() {
+            var cantCuotas = parseFloat(document.getElementById("cantCuotasValue").value) || 0;
+            var valor = parseFloat(document.getElementById("valorValue").value) || 0;
+            var valorTotal = document.getElementById("valorTotalValue");
+            valorTotal.value = (valor * cantCuotas).toFixed(2); // Actualizar el valor total y limitar a dos decimales
+        }
+
+        // Llamar a la función al cargar la página para establecer el estado inicial
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleTipo();
+        });
+
+        function validateForm() {
+            var fechaRegistro = new Date(document.querySelector('input[name="FechaRegistro"]').value);
+            var fechaFinInput = document.querySelector('input[name="FechaFin"]');
+            if (fechaFinInput && fechaFinInput.value) {
+                var fechaFin = new Date(fechaFinInput.value);
+                if (fechaFin < fechaRegistro) {
+                    alert("La Fecha Fin no puede ser menor que la Fecha de Registro");
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
+}

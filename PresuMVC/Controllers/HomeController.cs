@@ -10,12 +10,14 @@ namespace PresuMVC.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IRepositorioIngresos repositorioIngresos;
+        private readonly IRepositorioEgresos repositorioEgresos;
 
-        public HomeController(ILogger<HomeController> logger, IRepositorioIngresos repositorioIngresos)
+        public HomeController(ILogger<HomeController> logger, IRepositorioIngresos repositorioIngresos, IRepositorioEgresos repositorioEgresos)
         {
 
             _logger = logger;
             this.repositorioIngresos = repositorioIngresos;
+            this.repositorioEgresos = repositorioEgresos;
         }
 
         [HttpGet]
@@ -24,12 +26,13 @@ namespace PresuMVC.Controllers
             var fechaIndex = fecha ?? DateTime.Now;
             var ingresos = await repositorioIngresos.GetIngresosTotales(fechaIndex);
             // var egresos = await repositorioIngresos.GetEgresos(fechaIndex);
+            var egresos = await repositorioEgresos.GetEgresos();
 
             var modelo = new IndexViewModel()
             {
                 Fecha = new DateTime(fechaIndex.Year, fechaIndex.Month, 1),
-                Ingresos = ingresos
-                // egresos = egresos
+                Ingresos = ingresos,
+                Egresos = egresos
             };
             return View(modelo);
         }
@@ -179,6 +182,57 @@ namespace PresuMVC.Controllers
             }            
 
             return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+        }
+
+
+        public IActionResult CreateEgreso(DateTime fechaIndex)
+        {
+            var modelo = new Egreso
+            {
+                FechaRegistro = fechaIndex
+            };
+
+            return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateEgreso(Egreso egreso)
+        {
+            if (egreso.IdTipoEgreso == 2 || egreso.IdTipoEgreso == 1)
+            {
+                await repositorioEgresos.CreateEgreso(egreso);
+            }
+            else
+            {
+                var cantCuotas = egreso.CantCuotas.Value;
+                egreso.CuotaNro = 1;
+                egreso.FechaCuota = egreso.FechaRegistro;
+                egreso.FechaFin = egreso.FechaRegistro.AddMonths(cantCuotas);
+                egreso.ValorTotal = egreso.Valor * egreso.CantCuotas;
+
+
+                var idEgresoOriginal = await repositorioEgresos.CreateEgreso(egreso);
+
+                
+                for (var i=2; i<= cantCuotas; i++)
+                {
+                    var egresoCuota = new Egreso
+                    {
+                        Nombre = egreso.Nombre,
+                        Valor = egreso.Valor,
+                        FechaRegistro = egreso.FechaRegistro,
+                        FechaFin = egreso.FechaFin,
+                        CuotaNro = i,
+                        CantCuotas = egreso.CantCuotas,
+                        FechaCuota = egreso.FechaRegistro.AddMonths(i - 1),
+                        ValorTotal = egreso.ValorTotal,
+                        IdTipoEgreso = egreso.IdTipoEgreso,
+                        IdEgresoOriginal= idEgresoOriginal
+                    };
+                    await repositorioEgresos.CreateEgreso(egresoCuota);
+                }
+            }
+            return RedirectToAction("Index", new { fecha = egreso.FechaRegistro.ToString("yyyy-MM") });
         }
 
         public IActionResult Privacy()
