@@ -1,7 +1,6 @@
-### Aplicación para llevar al día nuestro Presupuesto 
+### Página web para llevar mes a mes nuestros ingresos y egresos
 
-Esta aplicación hecha en ASP.NET MVC 8 y SQL Server nos permite llevar al día nuestros ingresos y egresos mensuales.
-
-Tenemos ingresos de tipo únicos y mensuales, como podrían ser un regalo o un sueldo respectivamente
+En esta página hecha en ASP.NET MVC 8 y SQL Server
+tenemos ingresos de tipo únicos y mensuales, como podrían ser un regalo o un sueldo respectivamente
 
 De manera similar, tenemos egresos de tipo únicos, suscripciones o cuotas
