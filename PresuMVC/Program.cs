@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IRepositorioIngresos, RepositorioIngresos>();
+builder.Services.AddTransient<IRepositorioEgresos, RepositorioEgresos>();
 
 var app = builder.Build();
 
