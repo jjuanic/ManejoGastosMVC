@@ -56,6 +56,7 @@
     var sumatoriaIngresos = SumatoriaIngresos(Model.Ingresos);
     var sumatoriaEgresos = SumatoriaEgresos(Model.Egresos);
     var diferenciaIE = sumatoriaIngresos - sumatoriaEgresos;
+    var porcentajeIE = Math.Round(((sumatoriaIngresos - sumatoriaEgresos) / sumatoriaIngresos) * 100, 2);
 }
 
 <div class="text-center">
@@ -79,9 +80,10 @@
 <!-- Columna de Resumen (Placeholder) -->
 <div class="text-center">
     <h2>Resumen</h2>
-    <span>Ingresos: @sumatoriaIngresos</span> <br />
-    <span>Egresos: @sumatoriaEgresos</span> <br />
-    <span>Diferencia I-E: @diferenciaIE</span>
+    <span>Ingresos: $@sumatoriaIngresos</span> <br />
+    <span>Egresos: $@sumatoriaEgresos</span> <br />
+    <span>Diferencia: $@diferenciaIE</span><br />
+    <span>Porcentaje de Ahorro: %@porcentajeIE</span>
 </div>
 
 <!-- Reorganización en tres columnas -->
