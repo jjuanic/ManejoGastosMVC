@@ -114,10 +114,10 @@
                         <td>@ObtenerTipoIngreso(ingreso.IdTipoIngreso)</td>
                         <td>
                             <a asp-action="EditIngreso" asp-route-id="@ingreso.IdIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">
-                            <i class="bi bi-pencil"></i>
+                                <i class="bi bi-pencil-square"></i>
                             </a>
                             <a asp-action="DeleteIngreso" asp-route-id="@ingreso.IdIngreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-danger">
-                                <i class="bi bi-trash-fill"></i>
+                                <i class="bi bi-trash"></i>
                             </a>
                         </td>
                     </tr>
@@ -140,7 +140,7 @@
                     <th>Valor</th>
                     <th>Fecha Registro</th>
                     <th>Fecha Cuota</th>
-                    <th>Nro Cuota</th>
+                    <th>N° Cuota</th>
                     <th>Fecha Fin</th>
                     <th>Tipo Egreso</th>
                     <th>Acciones</th>
@@ -159,10 +159,10 @@
                         <td>@ObtenerTipoEgreso(egreso.IdTipoEgreso)</td>
                         <td>
                             <a asp-action="EditEgreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">
-                                <i class="bi bi-pencil"></i>
+                                <i class="bi bi-pencil-square"></i>
                             </a>
                             <a asp-action="DeleteEgreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-danger">
-                                <i class="bi bi-trash-fill"></i>
+                                <i class="bi bi-trash"></i>
                             </a>
                         </td>
                     </tr>

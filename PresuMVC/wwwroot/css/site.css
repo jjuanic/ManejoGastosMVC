@@ -22,17 +22,47 @@ body {
 }
 
 .filaIngreso {
-    background: #CCFFCB; /* Color de fondo */
-    border-bottom: 1px solid #dee2e6; /* Borde inferior */
+    background: #CCFFCB; 
+    border-bottom: 1px solid #000000; 
 }
 
 .filaIngreso tr:hover {
-   background: #9BFF99; /* Color de fondo al pasar el ratón */
+   background: #9BFF99; 
+}
+
+.filaEgresos {
+    background: #ffc1c1;
+    border-bottom: 1px solid #000000;
+}
+
+.filaEgresos tr:hover {
+    background: #fba7a7; 
 }
 
 .btn-info {
     background-color: #CEFDFF !important;
     border-color: #CEFDFF !important;
+}
+
+.btn-primary {
+    background-color: #CEFDFF !important;
+    border-color: #000000 !important;
+    color: #000000;
+}
+
+    .btn-primary:hover {
+        color: #000000;
+        background-color: #8ee3e9 !important; /* Cambia este valor al color que desees */
+    }
+
+.btn-secondary {
+    background-color: #fba7a7 !important;
+    color: #000000;
+    border-color: #000000 !important;
+}
+.btn-secondary:hover {
+    color: #000000;
+    background-color: #ff7676 !important; /* Cambia este valor al color que desees */
 }
 
 .container {

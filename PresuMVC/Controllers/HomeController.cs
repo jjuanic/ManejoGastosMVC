@@ -26,7 +26,7 @@ namespace PresuMVC.Controllers
             var fechaIndex = fecha ?? DateTime.Now;
             var ingresos = await repositorioIngresos.GetIngresosTotales(fechaIndex);
             // var egresos = await repositorioIngresos.GetEgresos(fechaIndex);
-            var egresos = await repositorioEgresos.GetEgresos();
+            var egresos = await repositorioEgresos.GetEgresosTotales(fechaIndex);
 
             var modelo = new IndexViewModel()
             {
