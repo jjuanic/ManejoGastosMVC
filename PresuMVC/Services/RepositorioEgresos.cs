@@ -7,8 +7,11 @@ namespace PresuMVC.Services
     public interface IRepositorioEgresos
     {
         Task<int> CreateEgreso(Egreso egreso);
+        Task DeleteEgreso(int id);
+        Task<Egreso> GetEgresoByID(int idEgreso);
         Task<IEnumerable<Egreso>> GetEgresos();
         Task<IEnumerable<Egreso>> GetEgresosTotales(DateTime date);
+        Task UpdateEgreso(Egreso egreso);
     }
     public class RepositorioEgresos : IRepositorioEgresos
     {
@@ -70,6 +73,57 @@ namespace PresuMVC.Services
                 AND IdTipoEgreso = 1)                     -- y no vencieron, o si lo hicieron, fue luego de este mes
                 ORDER BY IdTipoEgreso DESC, Valor DESC, FechaRegistro;",
                 new { Mes = date.Month, Año = date.Year, Fecha = date });
+        }
+
+        public async Task DeleteEgreso(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"DELETE Egreso WHERE IdEgreso = @Id", new { id });
+        }
+
+        public async Task<Egreso> GetEgresoByID(int idEgreso)
+        {
+            using var connection = new SqlConnection(connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Egreso>
+                (@"SELECT * FROM Egreso Where IdEgreso=@idEgreso", new { idEgreso });
+        }
+
+        public async Task UpdateEgreso(Egreso egreso)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var query = @"
+            UPDATE Egreso
+            SET 
+                Nombre = @Nombre,
+                Valor = @Valor,
+                FechaRegistro = @FechaRegistro, 
+                FechaFin = @FechaFin,
+                CuotaNro = @CuotaNro,
+                CantCuotas = @CantCuotas,
+                FechaCuota = @FechaCuota,
+                ValorTotal = @ValorTotal,
+                IdTipoEgreso = @IdTipoEgreso,
+                IdEgresoOriginal = @IdEgresoOriginal
+            WHERE 
+                IdEgreso = @IdEgreso";
+
+            var parameters = new
+            {
+                egreso.Nombre,
+                egreso.Valor,
+                egreso.FechaRegistro,
+                egreso.FechaFin,
+                egreso.CuotaNro,
+                egreso.CantCuotas,
+                egreso.FechaCuota,
+                egreso.ValorTotal,
+                egreso.IdTipoEgreso,
+                egreso.IdEgresoOriginal,
+                egreso.IdEgreso
+            };
+
+            await connection.ExecuteAsync(query, parameters);
         }
 
 

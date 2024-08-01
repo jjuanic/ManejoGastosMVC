@@ -23,6 +23,18 @@
         return egresos.Sum(egresos => egresos.Valor);
     }
 
+    float SumatoriaIngresosMensuales(IEnumerable<Ingreso> ingresos)
+    {
+        var ingresosMensuales = ingresos.Where(ingreso => ingreso.IdTipoIngreso == 1);
+        return SumatoriaIngresos(ingresosMensuales);
+    };
+
+    float SumatoriaEgresosMensuales(IEnumerable<Egreso> egresos)
+    {
+        var egresosMensuales = egresos.Where(egresos => (egresos.IdTipoEgreso == 1) || (egresos.IdTipoEgreso==3));
+        return SumatoriaEgresos(egresosMensuales);
+    };
+
     string FormatearFechaFin(DateTime? fecha)
     {
         if (!fecha.HasValue)
@@ -57,6 +69,11 @@
     var sumatoriaEgresos = SumatoriaEgresos(Model.Egresos);
     var diferenciaIE = sumatoriaIngresos - sumatoriaEgresos;
     var porcentajeIE = Math.Round(((sumatoriaIngresos - sumatoriaEgresos) / sumatoriaIngresos) * 100, 2);
+
+    var sumatoriaIngresosMensuales = SumatoriaIngresosMensuales(Model.Ingresos);
+    var sumatoriaEgresosMensuales = SumatoriaEgresosMensuales(Model.Egresos);
+    var diferenciaIEMensual = sumatoriaIngresosMensuales - sumatoriaEgresosMensuales;
+    var porcentajeIEMensual = Math.Round(((sumatoriaIngresosMensuales - sumatoriaEgresosMensuales) / sumatoriaIngresosMensuales) * 100, 2);
 }
 
 <div class="text-center">
@@ -80,11 +97,26 @@
 <!-- Columna de Resumen (Placeholder) -->
 <div class="text-center">
     <h2>Resumen</h2>
+    <div class="row">
+    <div class="col-md-4">
     <span>Ingresos: $@sumatoriaIngresos</span> <br />
     <span>Egresos: $@sumatoriaEgresos</span> <br />
     <span>Diferencia: $@diferenciaIE</span><br />
     <span>Porcentaje de Ahorro: %@porcentajeIE</span>
+    </div>
+
+    <div class="col-md-4">
+        <span>Ingresos Mensuales: $@sumatoriaIngresosMensuales</span> <br />
+        <span>Egresos Mensuales: $@sumatoriaEgresosMensuales</span> <br />
+        <span>Diferencia Mensual: $@diferenciaIEMensual </span> <br />
+            <span>Porcentaje de Ahorro Mensual: %@porcentajeIEMensual </span> <br />
+        </div>
+
+    </div>
+
 </div>
+
+ <br />
 
 <!-- Reorganización en tres columnas -->
 <div class="row">

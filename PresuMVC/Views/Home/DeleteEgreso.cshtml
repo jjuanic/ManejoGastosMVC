@@ -1,0 +1,13 @@
+﻿@model EgresoUpdateDeleteViewModel
+@{
+    ViewData["Title"] = "Borrar Egreso";
+}
+
+<h3 class"mb-3">¿Está seguro que desea borrar el ingreso: @Model.Nombre?</h3>
+
+<form asp-action="DeleteEgresoDef">
+    <input type="hidden" asp-for="IdEgreso" />
+    <input type="hidden" asp-for="FechaIndex" />
+    <button type="submit" class="btn btn-danger">Borrar</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+</form>

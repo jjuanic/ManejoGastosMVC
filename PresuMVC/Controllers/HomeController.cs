@@ -25,7 +25,6 @@ namespace PresuMVC.Controllers
         {
             var fechaIndex = fecha ?? DateTime.Now;
             var ingresos = await repositorioIngresos.GetIngresosTotales(fechaIndex);
-            // var egresos = await repositorioIngresos.GetEgresos(fechaIndex);
             var egresos = await repositorioEgresos.GetEgresosTotales(fechaIndex);
 
             var modelo = new IndexViewModel()
@@ -63,6 +62,16 @@ namespace PresuMVC.Controllers
             return View(modelo);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateIngreso(Ingreso ingreso)
+        {
+
+            await repositorioIngresos.CreateIngreso(ingreso);
+
+            return RedirectToAction("Index", new { fecha = ingreso.FechaRegistro.ToString("yyyy-MM") });
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> DeleteIngreso(int id, DateTime fechaIndex)
         {
@@ -77,6 +86,36 @@ namespace PresuMVC.Controllers
                         FechaIndex = fechaIndex
             };
             return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteIngresoDef(int idIngreso, DateTime fechaIndex)
+        {
+            var ingreso = await repositorioIngresos.GetIngresoByID(idIngreso);
+
+            if (ingreso.IdTipoIngreso == 2) // Único
+            {
+                await repositorioIngresos.DeleteIngreso(idIngreso);
+                return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+            }
+
+            if (ingreso.IdTipoIngreso == 1)
+            {
+                ingreso.FechaFin = fechaIndex.AddMonths(-1);
+                if (ingreso.FechaFin.Value < ingreso.FechaRegistro)
+                {
+                    await repositorioIngresos.DeleteIngreso(ingreso.IdIngreso);
+                    return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+                }
+                else
+                {
+                    await repositorioIngresos.UpdateIngreso(ingreso);
+                    return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+                }
+            }
+            //}
+
+            return View(ingreso);
         }
 
         [HttpGet]
@@ -94,45 +133,6 @@ namespace PresuMVC.Controllers
                 FechaIndex = fechaIndex
             };
             return View(modelo);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> DeleteIngresoDef(int idIngreso, DateTime fechaIndex)
-        {
-            var ingreso = await repositorioIngresos.GetIngresoByID(idIngreso);
-
-            if(ingreso.IdTipoIngreso == 2) // Único
-            {
-                await repositorioIngresos.DeleteIngreso(idIngreso);
-                return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
-            }
-
-            if(ingreso.IdTipoIngreso == 1)
-            {
-                    ingreso.FechaFin = fechaIndex.AddMonths(-1);
-                    if (ingreso.FechaFin.Value < ingreso.FechaRegistro)
-                    {
-                        await repositorioIngresos.DeleteIngreso(ingreso.IdIngreso);
-                        return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
-                    }
-                    else
-                    {
-                        await repositorioIngresos.UpdateIngreso(ingreso);
-                        return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
-                    }
-                }
-            //}
-
-            return View(ingreso);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateIngreso(Ingreso ingreso)
-        {
-            
-            await repositorioIngresos.CreateIngreso(ingreso);
-
-            return RedirectToAction("Index", new { fecha = ingreso.FechaRegistro.ToString("yyyy-MM") });
         }
 
         [HttpPost]
@@ -184,7 +184,7 @@ namespace PresuMVC.Controllers
             return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
         }
 
-
+        [HttpGet]
         public IActionResult CreateEgreso(DateTime fechaIndex)
         {
             var modelo = new Egreso
@@ -233,6 +233,63 @@ namespace PresuMVC.Controllers
                 }
             }
             return RedirectToAction("Index", new { fecha = egreso.FechaRegistro.ToString("yyyy-MM") });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteEgreso(int id, DateTime fechaIndex)
+        {
+            var egreso = await repositorioEgresos.GetEgresoByID(id);
+            var modelo = new EgresoUpdateDeleteViewModel
+            {
+                IdEgreso = egreso.IdEgreso,
+                Nombre = egreso.Nombre,
+                Valor = egreso.Valor,
+                FechaRegistro = egreso.FechaRegistro,
+                FechaFin = egreso.FechaFin,
+                CuotaNro = egreso.CuotaNro,
+                CantCuotas = egreso.CantCuotas,
+                FechaCuota = egreso.FechaCuota,
+                ValorTotal = egreso.ValorTotal,
+                IdTipoEgreso = egreso.IdTipoEgreso,
+                IdEgresoOriginal = egreso.IdEgresoOriginal,
+                FechaIndex = fechaIndex
+            };
+            return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteEgresoDef(int idEgreso, DateTime fechaIndex)
+        {
+            var egreso = await repositorioEgresos.GetEgresoByID(idEgreso);
+
+            if (egreso.IdTipoEgreso == 2) // Único
+            {
+                await repositorioEgresos.DeleteEgreso(idEgreso);
+                return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+            }
+
+            if (egreso.IdTipoEgreso == 1)
+            {
+                egreso.FechaFin = fechaIndex.AddMonths(-1);
+                if (egreso.FechaFin.Value < egreso.FechaRegistro)
+                {
+                    await repositorioEgresos.DeleteEgreso(egreso.IdEgreso);
+                    return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+                }
+                else
+                {
+                    await repositorioEgresos.UpdateEgreso(egreso);
+                    return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+                }
+            }
+
+            if (egreso.IdTipoEgreso == 3)
+            {
+                // IMPLEMENTAR ELIMINACIÓN DE CUOTAS
+            }
+            
+
+            return View(egreso);
         }
 
         public IActionResult Privacy()
