@@ -303,7 +303,14 @@ namespace PresuMVC.Controllers
 
                 if (tipoEliminacion == 3) // Eliminar todas las cuotas (desde el inicio)
                 {
-                    await repositorioEgresos.DeleteEgresoTodasCuotas(egreso.IdEgresoOriginal.Value);
+                    if (egreso.IdEgresoOriginal.HasValue)
+                    {
+                        await repositorioEgresos.DeleteEgresoTodasCuotas(egreso.IdEgresoOriginal.Value);
+                    }
+                    else
+                    {
+                        await repositorioEgresos.DeleteEgresoTodasCuotas(egreso.IdEgreso);
+                    }
                 }
                
             }

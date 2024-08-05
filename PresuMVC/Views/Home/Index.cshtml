@@ -1,4 +1,5 @@
-﻿@model IndexViewModel
+﻿
+@model IndexViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -74,10 +75,21 @@
     var sumatoriaEgresosMensuales = SumatoriaEgresosMensuales(Model.Egresos);
     var diferenciaIEMensual = sumatoriaIngresosMensuales - sumatoriaEgresosMensuales;
     var porcentajeIEMensual = Math.Round(((sumatoriaIngresosMensuales - sumatoriaEgresosMensuales) / sumatoriaIngresosMensuales) * 100, 2);
+
+    if (porcentajeIE != porcentajeIE || porcentajeIE < 0 || porcentajeIE>100)
+    {
+        porcentajeIE = 0;
+    }
+
+
+    if (porcentajeIEMensual != porcentajeIEMensual || porcentajeIEMensual < 0 || porcentajeIEMensual > 100)
+    {
+        porcentajeIEMensual = 0;
+    }
 }
 
 <div class="text-center">
-    <h1 class="display-4">Manejo de Gastos!</h1>
+    <h1 class="display-4">Manejo de Gastos</h1>
 </div>
 
 <div class="text-center">
