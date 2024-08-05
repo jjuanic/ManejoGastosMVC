@@ -167,12 +167,13 @@ namespace PresuMVC.Controllers
                     await repositorioIngresos.UpdateIngreso(ingresoModificado);
                 } else { 
 
-                ingresoViejo.FechaFin = fechaIndex.AddMonths(-1);
-
                 // Ahora, creamos un ingreso nuevo, para esto, asignamos al ingreso modificado id = 0
                 // y una fecha de creación igual al index.
                 ingresoModificado.IdIngreso = 0;
                 ingresoModificado.FechaRegistro = fechaIndex;
+                ingresoModificado.FechaFin = ingresoViejo.FechaFin;
+
+                ingresoViejo.FechaFin = fechaIndex.AddMonths(-1);
 
                 await repositorioIngresos.CreateIngreso(ingresoModificado);
 
@@ -315,6 +316,92 @@ namespace PresuMVC.Controllers
                
             }
 
+
+            return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditEgreso(int id, DateTime fechaIndex)
+        {
+            var egreso = await repositorioEgresos.GetEgresoByID(id);
+            var modelo = new EgresoUpdateDeleteViewModel
+            {
+                IdEgreso = egreso.IdEgreso,
+                Nombre = egreso.Nombre,
+                Valor = egreso.Valor,
+                FechaRegistro = egreso.FechaRegistro,
+                FechaFin = egreso.FechaFin,
+                CuotaNro = egreso.CuotaNro,
+                CantCuotas = egreso.CantCuotas,
+                FechaCuota = egreso.FechaCuota,
+                ValorTotal = egreso.ValorTotal,
+                IdTipoEgreso = egreso.IdTipoEgreso,
+                IdEgresoOriginal = egreso.IdEgresoOriginal,
+                FechaIndex = fechaIndex
+            };
+            return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditEgreso(EgresoUpdateDeleteViewModel egresoViewModel)
+        {
+            var egresoModificado = new Egreso
+            {
+                IdEgreso = egresoViewModel.IdEgreso,
+                Nombre = egresoViewModel.Nombre,
+                Valor = egresoViewModel.Valor,
+                FechaRegistro = egresoViewModel.FechaRegistro,
+                FechaFin = egresoViewModel.FechaFin,
+                CuotaNro = egresoViewModel.CuotaNro,
+                CantCuotas = egresoViewModel.CantCuotas,
+                FechaCuota = egresoViewModel.FechaCuota,
+                ValorTotal = egresoViewModel.ValorTotal,
+                IdTipoEgreso = egresoViewModel.IdTipoEgreso,
+                IdEgresoOriginal = egresoViewModel.IdEgresoOriginal
+            };
+
+
+            var fechaIndex = egresoViewModel.FechaIndex;
+
+            if (egresoModificado.IdTipoEgreso == 2) // Único
+            {
+                await repositorioEgresos.UpdateEgreso(egresoModificado);
+
+            }
+            
+            if (egresoModificado.IdTipoEgreso == 1)// Suscripción, dividimos el egreso en 2.
+            {
+                // Traemos el egreso sin modificar
+
+                var egresoViejo = await repositorioEgresos.GetEgresoByID(egresoModificado.IdEgreso);
+
+                if (egresoViejo.FechaFin.HasValue && (egresoViejo.FechaFin.Value.Month == fechaIndex.Month)) // Si estamos modificando en la fecha final
+                {
+                    await repositorioEgresos.UpdateEgreso(egresoModificado);
+                }
+                else
+                {
+                    // Ahora, creamos un egreso nuevo, para esto, asignamos al egreso modificado id = 0
+                    // y una fecha de creación igual al index.
+                    egresoModificado.IdEgreso = 0;
+                    egresoModificado.FechaRegistro = fechaIndex;
+                    egresoModificado.FechaFin = egresoViejo.FechaFin;
+
+                    // A este egreso viejo, le asignamos una fecha de fin = index - 1
+                    egresoViejo.FechaFin = fechaIndex.AddMonths(-1);
+
+                    await repositorioEgresos.CreateEgreso(egresoModificado);
+
+                    // Modificamos el egreso viejo para ponerle una fecha de fin.
+                    await repositorioEgresos.UpdateEgreso(egresoViejo);
+                }
+            }
+
+            if (egresoModificado.IdTipoEgreso == 3)
+            {
+
+            }
+            
 
             return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
         }
