@@ -6,6 +6,11 @@
 <h1>Estas editando un egreso para el mes @Model.FechaRegistro.Month del año @Model.FechaRegistro.Year</h1>
 <form asp-action="EditEgreso" method="post">
     <input type="hidden" asp-for="IdEgreso" />
+    <input type="hidden" asp-for="IdEgresoOriginal" />
+    <input type="hidden" asp-for="ValorTotal" />
+    <input type="hidden" asp-for="FechaFin" />
+    <input type="hidden" asp-for="FechaCuota" />
+    <input type="hidden" asp-for="CuotaNro" />
     <input type="hidden" asp-for="FechaRegistro" />
     <input type="hidden" asp-for="FechaIndex" />
     <input type="hidden" asp-for="IdTipoEgreso" id="idTipoEgreso" />
@@ -20,7 +25,7 @@
 
     <div class="mb-3" id="cantCuotasContainer" style="display:none;">
         <label asp-for="CantCuotas" class="form-label">Cantidad de Cuotas</label>
-        <input asp-for="CantCuotas" class="form-control" id="cantCuotasValue" oninput="actualizarValor()" />
+        <input asp-for="CantCuotas" class="form-control" id="cantCuotasValue" oninput="actualizarValor()" disabled />
         <span asp-validation-for="CantCuotas" class="text-danger"></span>
     </div>
 
@@ -38,6 +43,17 @@
         <input asp-for="ValorTotal" class="form-control" id="valorTotalValue" disabled />
         <span asp-validation-for="ValorTotal" class="text-danger"></span>
     </div>
+
+    <div id="cuotasContainer" style="display:none;">
+        <h5> El egreso es de tipo cuota, ¿cómo desea proceder?</h5>
+        <div class="mb-3">
+            <select asp-for="TipoEliminacion" class="form-select" id="tipoEliminacionSelect">
+                <option value="1">Editar esta cuota en particular</option>
+                <option value="2">Editar esta cuota y las siguientes</option>
+                <option value="3">Editar todas las cuotas (desde el inicio)</option>
+            </select>
+            <span asp-validation-for="TipoEliminacion" class="text-danger"></span>
+        </div>
 
     <button type="submit" class="btn btn-primary" onclick="return validateForm()">Guardar</button>
     <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
@@ -71,7 +87,18 @@
         // Llamar a la función al cargar la página para establecer el estado inicial
         document.addEventListener("DOMContentLoaded", function () {
             toggleTipo();
+            mostrarEliminacionCuotas();
         });
+
+        function mostrarEliminacionCuotas() {
+            var tipoEgreso = document.getElementById("idTipoEgreso").value;
+            var cuotasContainer = document.getElementById("cuotasContainer");
+            if (tipoEgreso == "3") {
+                cuotasContainer.style.display = "block";
+            } else {
+                cuotasContainer.style.display = "none";
+            }
+        }
 
         function validateForm() {
             var fechaRegistro = new Date(document.querySelector('input[name="FechaRegistro"]').value);

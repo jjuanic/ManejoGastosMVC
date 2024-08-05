@@ -343,7 +343,7 @@ namespace PresuMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditEgreso(EgresoUpdateDeleteViewModel egresoViewModel)
+        public async Task<IActionResult> EditEgreso(EgresoUpdateDeleteViewModel egresoViewModel, int? tipoEliminacion)
         {
             var egresoModificado = new Egreso
             {
@@ -359,7 +359,6 @@ namespace PresuMVC.Controllers
                 IdTipoEgreso = egresoViewModel.IdTipoEgreso,
                 IdEgresoOriginal = egresoViewModel.IdEgresoOriginal
             };
-
 
             var fechaIndex = egresoViewModel.FechaIndex;
 
@@ -397,9 +396,50 @@ namespace PresuMVC.Controllers
                 }
             }
 
-            if (egresoModificado.IdTipoEgreso == 3)
+            if (egresoModificado.IdTipoEgreso == 3) // cuotas
             {
+                var egresoViejo = await repositorioEgresos.GetEgresoByID(egresoModificado.IdEgreso);
 
+                // SOLO PUEDO MODIFICAR NOMBRE Y VALOR
+
+                egresoViejo.Nombre = egresoModificado.Nombre;
+                egresoViejo.Valor = egresoModificado.Valor;
+
+                // acá me dio paja cambiar el nombre de la variable. Mala mía.
+                if (tipoEliminacion == 1) // Editar esta cuota en particular
+                {
+                    await repositorioEgresos.UpdateEgresoCuotaNro(egresoViejo.Nombre, egresoViejo.Valor, egresoViejo.CuotaNro.Value, egresoViejo.IdEgresoOriginal.Value);
+                }
+
+                if (tipoEliminacion == 2) // Editar esta cuota y las siguientes
+                {
+                    if (egresoViejo.IdEgresoOriginal.HasValue)
+                    {
+                        for (int i = egresoViejo.CuotaNro.Value; i <= egresoViejo.CantCuotas; i++)
+                        { 
+                            await repositorioEgresos.UpdateEgresoCuotaNro(egresoViejo.Nombre, egresoViejo.Valor, i, egresoViejo.IdEgresoOriginal.Value);
+                        }
+                    }
+                    else
+                    {
+                        await repositorioEgresos.UpdateEgresoCuotaNro(egresoViejo.Nombre, egresoViejo.Valor, egresoViejo.CuotaNro.Value, egresoViejo.IdEgresoOriginal.Value);
+                    }
+                }
+
+                if (tipoEliminacion == 3) // Editar todas las cuotas
+                {
+                    if (egresoViejo.IdEgresoOriginal.HasValue)
+                    {
+                        for (int i = 1; i <= egresoViejo.CantCuotas; i++)
+                        {
+                            await repositorioEgresos.UpdateEgresoCuotaNro(egresoViejo.Nombre, egresoViejo.Valor, i, egresoViejo.IdEgresoOriginal.Value);
+                        }
+                    }
+                    else
+                    {
+                        await repositorioEgresos.UpdateEgresoCuotaNro(egresoViejo.Nombre, egresoViejo.Valor, egresoViejo.CuotaNro.Value, egresoViejo.IdEgresoOriginal.Value);
+                    }
+                }
             }
             
 

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using PresuMVC.Models;
+using System.Numerics;
 
 namespace PresuMVC.Services
 {
@@ -14,6 +15,7 @@ namespace PresuMVC.Services
         Task<IEnumerable<Egreso>> GetEgresos();
         Task<IEnumerable<Egreso>> GetEgresosTotales(DateTime date);
         Task UpdateEgreso(Egreso egreso);
+        Task UpdateEgresoCuotaNro(string nombre, float valor, int cuotaNro, int idEgresoOriginal);
     }
     public class RepositorioEgresos : IRepositorioEgresos
     {
@@ -147,6 +149,29 @@ namespace PresuMVC.Services
             await connection.ExecuteAsync(query, parameters);
         }
 
+        public async Task UpdateEgresoCuotaNro(string nombre, float valor, int cuotaNro, int idEgresoOriginal)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var query = @"
+            UPDATE Egreso
+            SET 
+                Nombre = @Nombre,
+                Valor = @Valor
+	        WHERE 
+	            (IdEgresoOriginal = @IdEgresoOriginal OR IdEgreso = @IdEgresoOriginal)AND
+	            CuotaNro = @CuotaNro";
+
+            var parameters = new
+            {
+                nombre,
+                valor,
+                cuotaNro,
+                idEgresoOriginal
+            };
+
+            await connection.ExecuteAsync(query, parameters);
+        }
 
     }
 }
