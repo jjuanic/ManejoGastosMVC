@@ -3,11 +3,44 @@
     ViewData["Title"] = "Borrar Egreso";
 }
 
-<h3 class"mb-3">¿Está seguro que desea borrar el ingreso: @Model.Nombre?</h3>
+<h3 class"mb-3">¿Está seguro que desea borrar el egreso: @Model.Nombre?</h3>
 
-<form asp-action="DeleteEgresoDef">
+<form asp-action="DeleteEgreso">
     <input type="hidden" asp-for="IdEgreso" />
     <input type="hidden" asp-for="FechaIndex" />
+    <input type="hidden" asp-for="IdTipoEgreso" id="idTipoEgreso"/>
+
+    <div id="cuotasContainer" style="display:none;">
+        <h5> El egreso es de tipo cuota, ¿cómo desea proceder?</h5>
+        <div class="mb-3">
+            <select asp-for="TipoEliminacion" class="form-select" id="tipoEliminacionSelect">
+                <option value="1">Eliminar esta cuota en particular</option>
+                <option value="2">Eliminar esta cuota y las siguientes</option>
+                <option value="3">Eliminar todas las cuotas (desde el inicio)</option>
+            </select>
+            <span asp-validation-for="TipoEliminacion" class="text-danger"></span>
+        </div>
+
+    </div>
     <button type="submit" class="btn btn-danger">Borrar</button>
     <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
 </form>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            mostrarEliminacionCuotas();
+        });
+
+        function mostrarEliminacionCuotas() {
+            var tipoEgreso = document.getElementById("idTipoEgreso").value;
+            var cuotasContainer = document.getElementById("cuotasContainer");
+            if (tipoEgreso == "3") {
+                cuotasContainer.style.display = "block";
+            } else {
+                cuotasContainer.style.display = "none";
+            }
+        }
+    </script>
+}

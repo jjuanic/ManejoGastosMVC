@@ -131,9 +131,9 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Valor</th>
-                    <th>Fecha Registro</th>
-                    <th>Fecha Fin</th>
-                    <th>Tipo Ingreso</th>
+                    <th>F. Registro</th>
+                    <th>F. Fin</th>
+                    <th>T. Ingreso</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -172,11 +172,11 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Valor</th>
-                    <th>Fecha Registro</th>
-                    <th>Fecha Cuota</th>
+                    <th>F. Registro</th>
+                    <th>F. Cuota</th>
                     <th>N° Cuota</th>
-                    <th>Fecha Fin</th>
-                    <th>Tipo Egreso</th>
+                    <th>F. Fin</th>
+                    <th>T. Egreso</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -192,9 +192,9 @@
                         <td>@FormatearFechaFin(egreso.FechaFin)</td>
                         <td>@ObtenerTipoEgreso(egreso.IdTipoEgreso)</td>
                         <td>
-                            <a asp-action="EditEgreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">
+@*                             <a asp-action="EditEgreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-info">
                                 <i class="bi bi-pencil-square"></i>
-                            </a>
+                            </a> *@
                             <a asp-action="DeleteEgreso" asp-route-id="@egreso.IdEgreso" asp-route-fechaIndex="@Model.Fecha.ToString("yyyy-MM-dd")" class="btn btn-danger">
                                 <i class="bi bi-trash"></i>
                             </a>

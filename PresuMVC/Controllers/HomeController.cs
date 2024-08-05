@@ -258,7 +258,7 @@ namespace PresuMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteEgresoDef(int idEgreso, DateTime fechaIndex)
+        public async Task<IActionResult> DeleteEgreso(int idEgreso, DateTime fechaIndex, int tipoEliminacion)
         {
             var egreso = await repositorioEgresos.GetEgresoByID(idEgreso);
 
@@ -285,11 +285,31 @@ namespace PresuMVC.Controllers
 
             if (egreso.IdTipoEgreso == 3)
             {
-                // IMPLEMENTAR ELIMINACIÓN DE CUOTAS
-            }
-            
+                if (tipoEliminacion == 1) // Eliminar esta cuota en particular
+                {
+                    await repositorioEgresos.DeleteEgreso(idEgreso);
+                } 
+                
+                if (tipoEliminacion == 2) // Eliminar esta cuota y las siguientes
+                {
+                    if (egreso.IdEgresoOriginal.HasValue) 
+                    {
+                    await repositorioEgresos.DeleteEgresoCuotasSiguientes(egreso.IdEgresoOriginal.Value, egreso.CuotaNro.Value);
+                    } else
+                    {
+                        await repositorioEgresos.DeleteEgresoCuotasSiguientes(egreso.IdEgreso, egreso.CuotaNro.Value);
+                    }
+                }
 
-            return View(egreso);
+                if (tipoEliminacion == 3) // Eliminar todas las cuotas (desde el inicio)
+                {
+                    await repositorioEgresos.DeleteEgresoTodasCuotas(egreso.IdEgresoOriginal.Value);
+                }
+               
+            }
+
+
+            return RedirectToAction("Index", new { fecha = fechaIndex.ToString("yyyy-MM") });
         }
 
         public IActionResult Privacy()

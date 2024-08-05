@@ -8,6 +8,8 @@ namespace PresuMVC.Services
     {
         Task<int> CreateEgreso(Egreso egreso);
         Task DeleteEgreso(int id);
+        Task DeleteEgresoCuotasSiguientes(int idEgresoOriginal, int nroCuota);
+        Task DeleteEgresoTodasCuotas(int id);
         Task<Egreso> GetEgresoByID(int idEgreso);
         Task<IEnumerable<Egreso>> GetEgresos();
         Task<IEnumerable<Egreso>> GetEgresosTotales(DateTime date);
@@ -79,6 +81,25 @@ namespace PresuMVC.Services
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync(@"DELETE Egreso WHERE IdEgreso = @Id", new { id });
+        }
+
+        public async Task DeleteEgresoCuotasSiguientes(int idEgresoOriginal, int nroCuota)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"DELETE Egreso
+                                            WHERE 
+                                            (IdEgresoOriginal = @IdEgresoOriginal OR IdEgreso = @IdEgresoOriginal)AND
+                                            CuotaNro >= @NroCuota", new { idEgresoOriginal, nroCuota });
+
+        }
+
+        public async Task DeleteEgresoTodasCuotas(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"DELETE Egreso
+                                            WHERE 
+                                            (IdEgresoOriginal = @Id OR IdEgreso = @Id)", new { id });
+
         }
 
         public async Task<Egreso> GetEgresoByID(int idEgreso)
