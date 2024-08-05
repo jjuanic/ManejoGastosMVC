@@ -28,7 +28,9 @@
         <label asp-for="Valor" class="form-label"></label>
         <input asp-for="Valor" class="form-control" id="valorValue" oninput="actualizarValor()" />
         <span asp-validation-for="Valor" class="text-danger"></span>
-        <text> En caso de estar ingresando un egreso en cuotas, este es el valor por cuota. </text>
+        <div class="mb-3" id="valorCuotaContainer" style="display::none" />
+            <text> Este es el valor por cuota. </text>
+        </div>
     </div>
 
     <div class="mb-3" id="valorTotalContainer" style="display:none;">
@@ -47,12 +49,15 @@
             var tipoEgreso = document.getElementById("idTipoEgreso").value;
             var cantCuotasContainer = document.getElementById("cantCuotasContainer");
             var valorTotalContainer = document.getElementById("valorTotalContainer");
+            var valorCuotaContainer = document.getElementById("valorCuotaContainer");
             if (tipoEgreso == "3") {
                 cantCuotasContainer.style.display = "block";
                 valorTotalContainer.style.display = "block";
+                valorCuotaContainer.style.display = "block";
             } else {
                 cantCuotasContainer.style.display = "none";
                 valorTotalContainer.style.display = "none";
+                valorCuotaContainer.style.display = "none";
             }
         }
 
